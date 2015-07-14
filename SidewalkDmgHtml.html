@@ -9,7 +9,7 @@
     <!-- Map takes up full browser window -->
     <style>
       html, body, #map {
-        height: 90%;
+        height: 95%;
         padding: 0;
         margin: 0;
       }
@@ -28,12 +28,16 @@
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.14/themes/css/cartodb.css" />
   </head>
   <body>
-	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <div id="map"></div>
+
+    <div id="map">
+		<input type="text" placeholder="Search By Apn" id="txt">
+	</div>
 	<div>
-		<input type="text" id="textBox">
+		<input type="text" placeholder="Search By Apn" id="textBox">
 		<input type="button" value="Find" id="Find">
 		<input type="button" value="Clear" id="Clear">
+		<br>
+		<input id="pac-input" class="controls" type="text" placeholder="Search By Address">
 	</div>
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=false&libraries=places"></script>
 	<!--<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>-->
@@ -148,7 +152,6 @@
 			sublayers[layerNum].setSQL(query);
 			sql.getBounds(query).done(function(bounds){
 				map_object.fitBounds(bounds, {maxZoom:17});
-				console.log(bounds);
 			})
 			return;
 		}
