@@ -123,6 +123,7 @@
 					lat = place.geometry.location.lat();
 					lng = place.geometry.location.lng();
 				}
+				//using bounds doesn't work leaflet bounds are not the same as google bounds
 				map_object.panTo({lat:lat, lng:lng});
 				map_object.setZoom(17);
 			});
@@ -162,7 +163,7 @@
 		
 	}
 	
-	
+		// https://developers.google.com/maps/documentation/javascript/examples/places-searchbox
 		// http://academy.cartodb.com/courses/03-cartodbjs-ground-up/lesson-1.html
     </script>
 
