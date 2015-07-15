@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Sidewalk Damage</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-    
-    <!-- Map takes up full browser window -->
-    <style>
-      html, body, #map {
-        height: 97%;
-        padding: 0;
-        margin: 0;
-      }
-	 <!-- .controls {
-        margin-top: 16px;
-        border: 1px solid transparent;
-        border-radius: 2px 0 0 2px;
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        height: 32px;
-        outline: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      }-->
-    </style>
-
-    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.14/themes/css/cartodb.css" />
-  </head>
-  <body>
-	<form role="form">
-		<div class="form-group">
-			<input id="pac-input" class="form-control" type="text" placeholder="Search By Address">
-			<input type="text" placeholder="Search By Apn" id="textBox">
-			<label for="selectionList">Layers</label>
-			<select class="form-control" id="selectionList">
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
-				<option>4</option>
-			</select>
-			<input type="button" value="Find" id="Find">
-			<input type="button" value="Clear" id="Clear">
+	<head>
+		<title>Sidewalk Damage</title>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+		
+		<!-- CSS Styling -->
+		<style type="text/css">
+			html, body, #map {
+				height: 98%;
+				padding: 0;
+				margin: 0;
+			}
+			.navbar.navbar-inverse {
+				margin: 0;
+				border: 0;
+				padding: 0;
+				padding-right: 20px;
+			}
+		</style>
+		<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.14/themes/css/cartodb.css" />
+	</head>
+	<!-- Navigation Bar -->
+	<nav class="navbar navbar-inverse">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Sidewalk Damage</a>
 		</div>
-	</form>
+		<div>
+			<ul class="nav navbar-nav">
+				<form class="navbar-form">
+					<div style="display:table;" class="input-group">
+						<span style="width: 8%;" class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+						<input type="text" class="form-control" placeholder="Search By Address" id="pac-input">
+					</div>
+				</form>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<form class="navbar-form pull-right">
+					<input type="text" class="form-control" placeholder="Search By Apn" id="textBox">
+					<input type="button" class="btn btn-primary" value="Find" id="Find">
+					<input type="button" class="btn btn-primary" value="Clear" id="Clear">
+				</form>
+			</ul>
+		</div>
+	</nav>
     <div id="map"></div>
 	
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -101,6 +103,9 @@
 			});
 		initSearchBox();
 		
+		<!-- Functions -->
+		//not fully optimized
+		<!--Geocoder Start-->
 		function initSearchBox(){
 			var input = /** @type {HTMLInputElement} */(document.getElementById('pac-input'));
 			var searchBox = new google.maps.places.SearchBox( /** @type {HTMLInputElement} */(input));
@@ -141,9 +146,11 @@
 				searchBox.setBounds(bounds);
 			});
 		}
+		<!--Geocoder End-->
 		
+		<!--Query Start-->
 		//query for createClickEvent requires the tablename and the comparison statement with the field to query
-		//separating the fieldquery into 2 separate functions, event handler and a query builder
+		//separating the fieldquery into 2 separate functions, eventcreator/wrapper and a query-er
 		function createClickEvent($button, query, layerNum){
 			$button.click(function(){
 				newQuery = "SELECT * FROM " + query + "'" + document.getElementById('textBox').value + "'";
@@ -167,7 +174,7 @@
 				createQuery(newQuery, layerNum);
 			})
 		}
-		
+		<!--Query End-->
 		
 	}
 		// http://www.w3schools.com/bootstrap/default.asp
