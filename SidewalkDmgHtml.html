@@ -9,7 +9,7 @@
     <!-- Map takes up full browser window -->
     <style>
       html, body, #map {
-        height: 95%;
+        height: 97%;
         padding: 0;
         margin: 0;
       }
@@ -28,17 +28,26 @@
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.14/themes/css/cartodb.css" />
   </head>
   <body>
-
-    <div id="map">
-		<input type="text" placeholder="Search By Apn" id="txt">
-	</div>
-	<div>
-		<input type="text" placeholder="Search By Apn" id="textBox">
-		<input type="button" value="Find" id="Find">
-		<input type="button" value="Clear" id="Clear">
-		<br>
-		<input id="pac-input" class="controls" type="text" placeholder="Search By Address">
-	</div>
+	<form role="form">
+		<div class="form-group">
+			<input id="pac-input" class="form-control" type="text" placeholder="Search By Address">
+			<input type="text" placeholder="Search By Apn" id="textBox">
+			<label for="selectionList">Layers</label>
+			<select class="form-control" id="selectionList">
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+			</select>
+			<input type="button" value="Find" id="Find">
+			<input type="button" value="Clear" id="Clear">
+		</div>
+	</form>
+    <div id="map"></div>
+	
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=false&libraries=places"></script>
 	<!--<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>-->
     <!-- include cartodb.js library -->
@@ -93,23 +102,22 @@
 		initSearchBox();
 		
 		function initSearchBox(){
-			var markers = [];
 			var input = /** @type {HTMLInputElement} */(document.getElementById('pac-input'));
-			
 			var searchBox = new google.maps.places.SearchBox( /** @type {HTMLInputElement} */(input));
 			
+			var marker = null;
 			google.maps.event.addListener(searchBox, 'places_changed', function(){
 				var places = searchBox.getPlaces();
 				if (places.length == 0){
 					return;
 				}
-				for (var i = 0, marker; marker = markers[i]; i++) {
-					marker.setMap(null);
-				}
 				
-				markers = [];
-				var lat;
-				var lng;
+				var lat, lng;
+				if(marker != null)
+				{
+					map_object.removeLayer(marker);
+				}
+
 				for (var i = 0, place; place = places[i]; i++){
 					var image = {
 						url: place.icon,
@@ -118,18 +126,14 @@
 						anchor: new google.maps.Point(17,34),
 						scaledSize: new google.maps.Size(25,25)
 					};
-					var marker = new google.maps.Marker({
-						icon: image,
-						title: place.name,
-						position: place.geometry.location
-					});
-					markers.push(marker);
 					lat = place.geometry.location.lat();
 					lng = place.geometry.location.lng();
 				}
-				//using bounds doesn't work leaflet bounds are not the same as google bounds
+				//using bounds doesn't work, leaflet bounds are not the same as google bounds
 				map_object.panTo({lat:lat, lng:lng});
 				map_object.setZoom(17);
+				marker = new L.marker([lat, lng],{clickable:false});
+				map_object.addLayer(marker);
 			});
 			
 			google.maps.event.addListener(map_object, 'bounds_changed', function(){
@@ -147,6 +151,7 @@
 			})
 		}
 		
+		//requires full query statement "Select * From tableName WHERE column = 'data'" and the layer number
 		function createQuery(query, layerNum){
 			var sql = new cartodb.SQL({user: layerSource.user_name});
 			sublayers[layerNum].setSQL(query);
@@ -165,7 +170,7 @@
 		
 		
 	}
-	
+		// http://www.w3schools.com/bootstrap/default.asp
 		// https://developers.google.com/maps/documentation/javascript/examples/places-searchbox
 		// http://academy.cartodb.com/courses/03-cartodbjs-ground-up/lesson-1.html
     </script>
