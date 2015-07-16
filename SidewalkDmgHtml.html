@@ -93,16 +93,23 @@
 			.addTo(map_object)
 			.done(function(layer){
 				var sublayer = layer.getSubLayer(0);
-				sublayers.push(sublayer);
-				//call functions to trigger the eventhandlers
-				createClickEvent($('#Find'), tableName + " WHERE apn = ", 0);
-				createClearEvent($('#Clear'), tableName, 0);
-				
+				sublayers.push(sublayer);		
 			})
 			.error(function(err){
 				console.log("error: " + err);
 			});
 		initSearchBox();
+		
+		//initialize buttons and code to handle cases
+		$('#Find').click(function(){
+			var newQuery = "SELECT * FROM " + tableName + " WHERE apn = " + "'" + document.getElementById('textBox').value + "'";
+			createQuery(newQuery, sublayers[0]);
+		});
+		
+		$('#Clear').click(function(){
+			var newQuery = "SELECT * FROM " + tableName;
+			createQuery(newQuery, sublayers[0]);
+		})
 		
 		<!-- Functions -->
 		//not fully optimized
@@ -149,32 +156,17 @@
 		}
 		<!--Geocoder End-->
 		
-		<!--Query Start-->
-		//need to re-write this for additional layers
-		//query for createClickEvent requires the tablename and the comparison statement with the field to query
-		//separating the fieldquery into 2 separate functions, eventcreator/wrapper and a query-er
-		function createClickEvent($button, query, layerNum){
-			$button.click(function(){
-				newQuery = "SELECT * FROM " + query + "'" + document.getElementById('textBox').value + "'";
-				createQuery(newQuery, layerNum);
-			})
-		}
-		
-		//requires full query statement "Select * From tableName WHERE column = 'data'" and the layer number
-		function createQuery(query, layerNum){
+		<!--Query Start-->	
+		//re-written, this is all you need
+		//still needs to be in main/onload unless you pass in the mapobject and the username
+		//requires full query statement "Select * From tableName WHERE column = 'data'" and the layer object
+		function createQuery(query, myLayer){
 			var sql = new cartodb.SQL({user: layerSource.user_name});
-			sublayers[layerNum].setSQL(query);
+			myLayer.setSQL(query);
 			sql.getBounds(query).done(function(bounds){
 				map_object.fitBounds(bounds, {maxZoom:17});
 			})
 			return;
-		}
-		
-		function createClearEvent($button, query, layerNum){
-			$button.click(function(){
-				newQuery = "SELECT * FROM " + query;
-				createQuery(newQuery, layerNum);
-			})
 		}
 		<!--Query End-->
 		
