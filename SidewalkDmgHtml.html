@@ -158,7 +158,7 @@
 		
 		<!--Query Start-->	
 		//re-written, this is all you need
-		//still needs to be in main/onload unless you pass in the mapobject and the username
+		//still needs to be in main/onload unless you pass in the mapobject and the username or the username could just be a static
 		//requires full query statement "Select * From tableName WHERE column = 'data'" and the layer object
 		function createQuery(query, myLayer){
 			var sql = new cartodb.SQL({user: layerSource.user_name});
