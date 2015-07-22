@@ -125,6 +125,8 @@
 						bounds.extend(place.geometry.location);
 					}
 					//changing max zoom level of map to limit zoom of the function then changing it back
+					//google maps api does not support fitBounds with options
+					//works better than setBounds because we may have queries later that are not only in 1 spot
 					map_object.setOptions({maxZoom:18});
 					map_object.fitBounds(bounds);
 					map_object.setOptions({maxZoom:21});
