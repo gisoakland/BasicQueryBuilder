@@ -112,17 +112,24 @@
 		//not fully optimized
 		<!--Geocoder Start-->
 		function initSearchBox(){
-			var input = /** @type {HTMLInputElement} */(document.getElementById('pac-input'));
-			var searchBox = new google.maps.places.Autocomplete( /** @type {HTMLInputElement} */(input));
+			var bounds = map_object.getBounds();
+			var latlngSW = new google.maps.LatLng(bounds._southWest.lat, bounds._southWest.lng);
+			var latlngNE = new google.maps.LatLng(bounds._northEast.lat, bounds._northEast.lng);
+			var defaultBound = new google.maps.LatLngBounds();
+			defaultBound.extend(latlngSW);
+			defaultBound.extend(latlngNE);
+			
+			var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'), {bounds: defaultBound});
 			var marker = null;
-			google.maps.event.addListener(searchBox, 'place_changed', function(){
-				var place = searchBox.getPlace();
+			google.maps.event.addListener(searchBox, 'places_changed', function(){
+				var place = searchBox.getPlaces()[0];
+				if(!place.geometry){
+					return;
+				}
 				if(marker != null){
 					map_object.removeLayer(marker);
 				}
-				//using bounds doesn't work, leaflet bounds are not the same as google bounds
-				map_object.panTo({lat:place.geometry.location.lat(), lng:place.geometry.location.lng()});
-				map_object.setZoom(17);
+				map_object.setView(new L.LatLng(place.geometry.location.lat(), place.geometry.location.lng()), 17);
 				marker = new L.marker([place.geometry.location.lat(), place.geometry.location.lng()],{clickable:false});
 				map_object.addLayer(marker);
 			});
