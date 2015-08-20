@@ -10,7 +10,7 @@
 		<!-- CSS Styling -->
 		<style type="text/css">
 			html, body, #map {
-				height: 98%;
+				height: 98.3%;
 				padding: 0;
 				margin: 0;
 			}
@@ -138,14 +138,43 @@
 		
 		// Instantiate map on specified DOM element
 		var map_object = new L.Map(map, options);
-		
-		// Add a basemap to the map object just created
-		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+		//add basemaps
+		var Positron = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
 			maxZoom:22,
-			maxNativeZoom:18 //zoom level to scale additional zoom layers
-			}).addTo(map_object);
-        
+			maxNativeZoom: 18
+		}).on('load',function(){
+			Positron.bringToBack();
+		});
+		var OSM = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+			maxZoom:22,
+			maxNativeZoom: 19
+		}).on('load',function(){
+			OSM.bringToBack();
+		});
+		var Esri_WorldTopoMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+			attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+			maxZoom:22,
+			maxNativeZoom: 19
+		}).on('load',function(){
+			Esri_WorldTopoMap.bringToBack();
+		}).addTo(map_object);
+		var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+			maxZoom:22,
+			maxNativeZoom: 19
+		}).on('load',function(){
+			Esri_WorldImagery.bringToBack();
+		});
+		var myBasemaps = {
+			'Positron': Positron,
+			'Open Street Map': OSM,
+			'Esri World Topo Map': Esri_WorldTopoMap,
+			'Esri World Imagery': Esri_WorldImagery
+		}
+		L.control.layers(myBasemaps, null, {collapsed:false, position:'bottomright'}).addTo(map_object);
+
 		var sublayers = [];
 		cartodb.createLayer(map_object, layerSource[0].vizjson)
 			.addTo(map_object)
@@ -172,6 +201,11 @@
 		$('#Find').click(function(){
 			var newQuery = "SELECT * FROM " + layerSource[0].tableName[0] + " WHERE apn = " + "'" + document.getElementById('textBox').value + "'";
 			createQuery(newQuery, sublayers[0]);
+		});
+		$('#textBox').keypress(function(e){
+			var newQuery = "SELECT * FROM " + layerSource[0].tableName[0] + " WHERE apn = " + "'" + document.getElementById('textBox').value + "'";
+			createQuery(newQuery, sublayers[0]);
+			return false;
 		});
 		
 		$('#Clear').click(function(){
@@ -232,10 +266,10 @@
 		//still needs to be in main/onload unless you pass in the mapobject and the username or the username could just be a static
 		//requires full query statement "Select * From tableName WHERE column = 'data'" and the layer object
 		function createQuery(query, myLayer){
-			var sql = new cartodb.SQL({user});
+			var sql = new cartodb.SQL({user:user});
 			myLayer.setSQL(query);
 			sql.getBounds(query).done(function(bounds){
-				map_object.fitBounds(bounds, {maxZoom:17});
+				map_object.fitBounds(bounds, {maxZoom:18});
 			})
 			return;
 		}
